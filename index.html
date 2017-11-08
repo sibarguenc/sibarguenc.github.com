@@ -1,26 +1,134 @@
-<!doctype html>
-<html class="no-js" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css?family=Kanit:400,500" rel="stylesheet">
-    <title>Foundation Starter Template</title>
-    <link rel="stylesheet" href="css/foundation.css" />
-  </head>
-  <body>
-    <h1>Hello, world!</h1>
+<html>
+    <head>
+      <!-- Tread on Trump is hiring! -->
 
-    <div class="row"> </div>
+      <!-- You're fired! -->
+    </head>
+    <body>
+        <!-- Include PandaJS -->
+        <script src="https://d2t45z63lq9zlh.cloudfront.net/panda-v0.0.5.min.js"></script>
+        <!-- Include jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <div id="donation_amount"></div>
+        <div id="donation_destination"></div>
+        <div id="donation_address"></div>
+        <form id="panda_cc_form">
+          <div>
+            <label>Destination EIN</label>
+            <input type="text" name="destination_ein" data-panda="destination_ein">
+          </div>
 
+          <div>
+            <label>First Name</label>
+            <input type="text" name="first_name" data-panda="first_name">
+          </div>
 
+          <div>
+            <label>Last Name</label>
+            <input type="text" name="last_name" data-panda="last_name">
+          </div>
 
-    <script src="js/vendor/jquery.js"></script>
-    <script src="js/vendor/what-input.js"></script>
-    <script src="js/vendor/foundation.min.js"></script>
-    <script>
-      $(document).foundation();
-    </script>
+          <div>
+            <label>Credit Card Number</label>
+            <input type="text" name="credit_card" data-panda="credit_card">
+          </div>
 
-  </body>
+          <div>
+            <label>Expiration</label>
+            <input type="text" name="expiration" data-panda="expiration">
+          </div>
+
+          <div>
+            <label>CVV</label>
+            <input type="text" name="cvv" data-panda="cvv">
+          </div>
+
+          <input type="hidden" name="source" data-panda="source">
+
+          <input type="hidden" name="amount" data-panda="amount">
+
+          <input type="hidden" name="currency" data-panda="currency" value="usd">
+
+          <div id="tokenize">
+            <button type="submit">Tokenize!</button>
+          </div>
+        </form>
+
+        <script>
+          var $donationForm = $('#panda_cc_form');
+          var $donationDestination = $('#donation_destination');
+          var $donationAddress = $('#donation_address');
+          var $donationAmount = $('#donation_amount');
+
+          var url = window.location.href;
+          var challenge = url.match(/(challenge=[^&]*)/g);
+          if (challenge && challenge[0] === 'challenge=lost') {
+              $donationForm.find('input[data-panda=destination_ein]').val('loser');
+              $donationDestination.text('Some loser organization');
+              $donationAddress.text('123 GO FUCK YOURSELF, NEW YORK, NY');
+              console.log('loser!');
+          } else {
+              $donationForm.find('input[data-panda=destination_ein]').val('13-6213516');
+              $donationDestination.text('American Civil Liberties Union Foundation Inc.');
+              $donationAddress.text('125 BROAD STREET, NEW YORK, NY');
+              console.log('winner!');
+          }
+          var donation = url.match(/(donation=[^&]*)/g);
+          if (donation) {
+              donation = donation[0].replace('donation=','');
+              console.log(donation);
+              $donationForm.find('input[data-panda=amount]').val(donation);
+              $donationAmount.text('Ready to donate $'+ Math.round(parseInt(donation)/100)+'.00 to');
+              console.log('Donate!');
+          }
+
+          // Call Panda.init() with your Panda Publishable Key and the DOM id of the
+          // credit card-related form element
+
+          Panda.init('pk_test_s7bEyQ3lOfq6Z0x4CHTWtA', 'panda_cc_form');
+
+          Panda.on('success', function(cardToken) {
+            // You now have a token you can use to refer to that credit card later.
+            // This token is used in PandaPay API calls for creating donations and grants
+            // so that you don't have to worry about security concerns with dealing with
+            // credit card data.
+            console.log(cardToken);
+
+            // Add the credit card to our source data
+            $donationForm.find('input[data-panda=source]').val(cardToken);
+
+            console.log(JSON.stringify({
+                url: 'https://d72e342f-feab-4fd2-88c5-e9ee8a1814fd.trayapp.io',
+                type: 'post',
+                data: $donationForm.serialize()
+            }));
+            var go = prompt('Does this look right? Y/N');
+            if (go.toLowerCase() === 'y') {
+              $.ajax({
+                  url: 'https://d72e342f-feab-4fd2-88c5-e9ee8a1814fd.trayapp.io',
+                  type: 'post',
+                  crossDomain: true,
+                  data: $donationForm.serialize()
+              })
+                  .then(function() {
+
+                      alert('Donated!');
+
+                  })
+                  .fail(function(resp) {
+                      alert(JSON.stringify(resp));
+                  });
+            }
+          });
+
+          Panda.on('error', function(errors) {
+            // errors is a human-readable list of things that went wrong
+            //  (invalid card number, missing last name, etc.)
+
+            for (var i = 0; i < errors.length; i++) {
+                console.log('You broke it with your ' + JSON.stringify(errors[i]));
+            }
+          });
+        </script>
+    </body>
 </html>
