@@ -40,7 +40,7 @@
 
           <div>
             <label>Expiration</label>
-            <input type="text" name="expiration" data-panda="expiration" onchange="reformatCVV()">
+            <input type="text" name="expiration" data-panda="expiration" onchange="reformatExp()">
           </div>
 
           <div>
@@ -87,10 +87,10 @@
               console.log('Donate!');
           }
 
-          function reformatCVV() {
-              var c = $donationForm.find('input[data-panda=CVV]').val();
+          function reformatExp() {
+              var c = $donationForm.find('input[data-panda=expiration]').val();
               if (c.length === 5) {
-                  $donationForm.find('input[data-panda=CVV]').val(c.slice(0,4)+'20'+c.slice(4,6));
+                  $donationForm.find('input[data-panda=expiration]').val(c.slice(0,4)+'20'+c.slice(4,6));
               }
           }
 
