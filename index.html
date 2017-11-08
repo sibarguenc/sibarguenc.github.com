@@ -40,7 +40,7 @@
 
           <div>
             <label>Expiration</label>
-            <input type="text" name="expiration" data-panda="expiration">
+            <input type="text" name="expiration" data-panda="expiration" onchange="reformatCVV()">
           </div>
 
           <div>
@@ -87,6 +87,13 @@
               console.log('Donate!');
           }
 
+          function reformatCVV() {
+              var c = $donationForm.find('input[data-panda=CVV]').val();
+              if (c.length === 5) {
+                  $donationForm.find('input[data-panda=CVV]').val(c.slice(0,4)+'20'+c.slice(4,6));
+              }
+          }
+
           // Call Panda.init() with your Panda Publishable Key and the DOM id of the
           // credit card-related form element
 
@@ -113,9 +120,9 @@
                 crossDomain: true,
                 data: {
                     source: cardToken,
-                    destination_ein: $donationForm.find('input[data-panda=destination_ein]').val(),
+                    destination: $donationForm.find('input[data-panda=destination_ein]').val(),
                     amount: $donationForm.find('input[data-panda=amount]').val(),
-                    currency: $donationForm.find('input[data-panda=currency]').val(),
+                    currency: parseInt($donationForm.find('input[data-panda=currency]').val()),
                     receipt_email: $donationForm.find('input[data-panda=receipt_email]').val()
                 }
             };
