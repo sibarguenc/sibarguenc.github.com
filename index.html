@@ -90,7 +90,7 @@
           function reformatExp() {
               var c = $donationForm.find('input[data-panda=expiration]').val();
               if (c.length === 5) {
-                  $donationForm.find('input[data-panda=expiration]').val(c.slice(0,4)+'20'+c.slice(4,6));
+                  $donationForm.find('input[data-panda=expiration]').val(c.slice(0,3)+'20'+c.slice(3,5));
               }
           }
 
@@ -121,8 +121,8 @@
                 data: {
                     source: cardToken,
                     destination: $donationForm.find('input[data-panda=destination_ein]').val(),
-                    amount: $donationForm.find('input[data-panda=amount]').val(),
-                    currency: parseInt($donationForm.find('input[data-panda=currency]').val()),
+                    amount: parseInt($donationForm.find('input[data-panda=amount]').val()),
+                    currency: $donationForm.find('input[data-panda=currency]').val(),
                     receipt_email: $donationForm.find('input[data-panda=receipt_email]').val()
                 }
             };
