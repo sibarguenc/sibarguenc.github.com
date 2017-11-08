@@ -29,6 +29,11 @@
           </div>
 
           <div>
+            <label>Receipt Email</label>
+            <input type="text" name="receipt_email" data-panda="receipt_email">
+          </div>
+
+          <div>
             <label>Credit Card Number</label>
             <input type="text" name="credit_card" data-panda="credit_card">
           </div>
@@ -96,20 +101,28 @@
 
             // Add the credit card to our source data
             $donationForm.find('input[data-panda=source]').val(cardToken);
-
-            console.log(JSON.stringify({
+            // var postObj = {
+            //     url: 'https://d72e342f-feab-4fd2-88c5-e9ee8a1814fd.trayapp.io',
+            //     type: 'post',
+            //     crossDomain: true,
+            //     data: $donationForm.serialize()
+            // };
+            var postObj = {
                 url: 'https://d72e342f-feab-4fd2-88c5-e9ee8a1814fd.trayapp.io',
                 type: 'post',
-                data: $donationForm.serialize()
-            }));
+                crossDomain: true,
+                data: {
+                    source: cardToken,
+                    destination_ein: $donationForm.find('input[data-panda=destination_ein]').val(),
+                    amount: $donationForm.find('input[data-panda=amount]').val(),
+                    currency: $donationForm.find('input[data-panda=currency]').val(),
+                    receipt_email: $donationForm.find('input[data-panda=receipt_email]').val()
+                }
+            };
+            console.log(JSON.stringify(postObj));
             var go = prompt('Does this look right? Y/N');
             if (go.toLowerCase() === 'y') {
-              $.ajax({
-                  url: 'https://d72e342f-feab-4fd2-88c5-e9ee8a1814fd.trayapp.io',
-                  type: 'post',
-                  crossDomain: true,
-                  data: $donationForm.serialize()
-              })
+              $.ajax(postObj)
                   .then(function() {
 
                       alert('Donated!');
